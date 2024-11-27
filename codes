@@ -1,0 +1,858 @@
+NATURAL SORT ORDER
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        List<String> strings = new ArrayList<>();
+        strings.add("file1.txt");
+        strings.add("file10.txt");
+        strings.add("file2.txt");
+        strings.add("file20.txt");
+        strings.add("file3.txt");
+        strings.sort((a, b) -> {
+            String[] partsA = a.split("(\\D+)");
+            String[] partsB = b.split("(\\D+)");
+            int len = Math.min(partsA.length, partsB.length);
+            for (int i = 0; i < len; i++) {
+                try {
+                    int numA = Integer.parseInt(partsA[i]);
+                    int numB = Integer.parseInt(partsB[i]);
+                    if (numA != numB) return Integer.compare(numA, numB);
+                } catch (NumberFormatException e) {
+                    int cmp = partsA[i].compareTo(partsB[i]);
+                    if (cmp != 0) return cmp;
+                }
+            }
+            return a.compareTo(b);
+        });
+        for (String str : strings) {
+            System.out.println(str);
+        }
+    }
+}
+===================================================================
+QUICKSORT
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {8, 3, 1, 7, 0, 10, 2};
+        quickSort(arr, 0, arr.length - 1);
+        System.out.println("Sorted array:");
+        for (int num : arr) {
+            System.out.print(num + " ");
+        }
+    }
+    public static void quickSort(int[] arr, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(arr, low, high);
+            quickSort(arr, low, pivotIndex - 1); // Sort left part
+            quickSort(arr, pivotIndex + 1, high); // Sort right part
+        }
+    }
+
+    // Partition function
+    public static int partition(int[] arr, int low, int high) {
+        int pivot = arr[high]; // Choose the last element as the pivot
+        int i = low;
+        for (int j = low; j < high; j++) {
+            if (arr[j] <= pivot) {
+                // Swap elements
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+                i++;
+            }
+        }
+        int temp = arr[i];
+        arr[i] = arr[high];
+        arr[high] = temp;
+        return i;
+    }
+}
+===================================================================
+SELECTION SORT
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {64, 25, 12, 22, 11};
+        selectionSort(arr);
+        for (int num : arr) System.out.print(num + " ");
+    }
+    public static void selectionSort(int[] arr) {
+        for (int i = 0; i < arr.length - 1; i++) {
+            int minIndex = i;
+            for (int j = i + 1; j < arr.length; j++) {
+                if (arr[j] < arr[minIndex]) minIndex = j;
+            }
+            int temp = arr[minIndex];
+            arr[minIndex] = arr[i];
+            arr[i] = temp;
+        }
+    }
+}
+===============================================================
+WEIGHTED STRING 
+public class Main {
+    public static void main(String[] args) {
+        String s = "abcde";
+        int[] weights = {1, 2, 3, 4, 5};
+        System.out.println(maxWeightedSubstring(s, weights));
+    }
+    public static int maxWeightedSubstring(String s, int[] weights) {
+        int maxWeight = 0, currentWeight = 0;
+        for (char c : s.toCharArray()) {
+            currentWeight += weights[c - 'a'];
+            maxWeight = Math.max(maxWeight, currentWeight);
+            if (currentWeight < 0) currentWeight = 0;
+        }
+        return maxWeight;
+    }
+}
+===================================================================
+MOVE HYPHEN 
+public class Main {
+    public static void main(String[] args) {
+        String s = "ab-cd-ef-gh";
+        System.out.println(moveHyphens(s));
+    }
+    public static String moveHyphens(String s) {
+        StringBuilder hyphens = new StringBuilder(), others = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (c == '-') hyphens.append(c);
+            else others.append(c);
+        }
+        return hyphens.append(others).toString();
+    }
+}
+==================================================================
+MANACHAR'S
+public class Main {
+    public static void main(String[] args) {
+        String s = "babad";
+        System.out.println(longestPalindrome(s));
+    }
+    public static String longestPalindrome(String s) {
+        int n = s.length(), center = 0, right = 0, maxLen = 0, start = 0;
+        int[] p = new int[2 * n + 1];
+        char[] t = new char[2 * n + 1];
+        for (int i = 0; i < t.length; i++) t[i] = (i % 2 == 0) ? '#' : s.charAt(i / 2);
+        for (int i = 1; i < t.length - 1; i++) {
+            if (i < right) p[i] = Math.min(right - i, p[2 * center - i]);
+            while (i + p[i] + 1 < t.length && i - p[i] - 1 >= 0 && t[i + p[i] + 1] == t[i - p[i] - 1]) p[i]++;
+            if (i + p[i] > right) {
+                center = i;
+                right = i + p[i];
+            }
+            if (p[i] > maxLen) {
+                maxLen = p[i];
+                start = (i - maxLen) / 2;
+            }
+        }
+        return s.substring(start, start + maxLen);
+    }
+}
+==================================================================
+SORTED UNIQUE PERMUTATION
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        String s = "aabc";
+        List<String> permutations = sortedUniquePermutations(s);
+        for (String p : permutations) System.out.println(p);
+    }
+    public static List<String> sortedUniquePermutations(String s) {
+        List<String> result = new ArrayList<>();
+        permute(s.toCharArray(), 0, result);
+        Collections.sort(result);
+        return result.stream().distinct().toList();
+    }
+    private static void permute(char[] chars, int l, List<String> result) {
+        if (l == chars.length) result.add(new String(chars));
+        for (int i = l; i < chars.length; i++) {
+            swap(chars, l, i);
+            permute(chars, l + 1, result);
+            swap(chars, l, i);
+        }
+    }
+    private static void swap(char[] chars, int i, int j) {
+        char temp = chars[i];
+        chars[i] = chars[j];
+        chars[j] = temp;
+    }
+}
+================================================================
+MANEUVERING A CAVE
+public class Main {
+    static int numberOfPaths(int m, int n) {
+        if (m == 1 || n == 1) return 1;
+        return numberOfPaths(m - 1, n) + numberOfPaths(m, n - 1);
+    }
+    public static void main(String[] args) {
+        System.out.println(numberOfPaths(3, 3));
+    }
+}
+================================================================
+COMBINATION
+import java.util.*;
+public class Main {
+    static int fact(int number) {
+        int f = 1;
+        for (int j = 1; j <= number; j++) f *= j;
+        return f;
+    }
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(9, 12, 19, 61, 19);
+        int n = numbers.size();
+        int r = 2;
+        int result = fact(n) / (fact(r) * fact(n - r));
+        System.out.println("The combination value for the numbers list is: " + result);
+    }
+}
+==================================================================
+JOSEPHUS TRAP
+public class Main {
+    static int josephus(int n, int k) {
+        if (n == 1) return 0;
+        return (josephus(n - 1, k) + k) % n;
+    }
+    public static void main(String[] args) {
+        int n = 5, k = 2;
+        System.out.println("The safe position is: " + (josephus(n, k) + 1));
+    }
+}
+==================================================================
+BLOCK SWAP
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        int n;
+        int k;
+        Scanner sc = new Scanner(System.in);
+        n = sc.nextInt();
+        int arr[] = new int[n];
+        for(int i = 0; i < n; i++) {
+            arr[i]=sc.nextInt();
+        }
+        k = sc.nextInt();
+        k = k%n;
+        int temp[]=new int[k];
+        System.arraycopy(arr,0,temp,0,k);
+        System.arraycopy(arr,k,arr,0,n-k);
+        System.arraycopy(temp,0,arr,n-k,k);
+        for(int i = 0;i<n;i++){
+            System.out.print(arr[i]+" ");
+        }
+        }
+}
+==================================================================
+BOOTH
+import java.util.Scanner;
+public class Main {
+    public int multiply(int n1, int n2) {
+        int m = n1;
+        int r = n2;
+        int A = n1;
+        int S = -n1;
+        int P = 0;
+        int count = Integer.SIZE;            
+        System.out.print(count);
+                    while (count > 0) {
+            if ((r & 1) == 1) {
+                P += A;
+                S += m;
+            }
+            A <<= 1;
+            S <<= 1;
+            count--;
+            r >>= 1;
+        }
+        return P;
+    }
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        Booth b = new Booth();
+        System.out.println("Enter two integer numbers -");
+        int n1 = scan.nextInt();
+        int n2 = scan.nextInt();
+        int result = b.multiply(n1, n2);
+        System.out.println("\n\nResult : " + n1 + " * " + n2 + " = " + result);
+}
+}
+========================================================================
+GCD
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        int n1, n2;
+        Scanner sc = new Scanner(System.in);
+        n1 = sc.nextInt();
+        n2 = sc.nextInt();
+        if (n1 < n2) {
+            int temp = n1;
+            n1 = n2;
+            n2 = temp;
+        }
+        int result = gcd(n1,n2);
+        System.out.println("The GCD of " + n1 + " and " + n2 + " is: " + result);
+    }
+
+    public static int gcd(int n1, int n2) {
+        if(n1 == 0){
+            return  n2;
+        }
+        return gcd(n2%n1,n1);
+        
+    }
+}
+======================================================================
+LONGEST 1
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String binaryString = sc.next(); // Read input as a string
+        int count = 0, maxCount = 0;
+        for (char i : binaryString.toCharArray()) {
+            if (i == '1') {
+                count++;
+                if (count > maxCount) {
+                    maxCount = count;
+                }
+            } else {
+                count = 0;
+            }
+        }
+
+        System.out.println("The longest sequence of 1's is: " + maxCount);
+    }
+}
+================================================================
+BINARYPALINDROME
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int x = sc.nextInt();        
+        String binaryString = Integer.toBinaryString(x);
+        String reversedString = new StringBuilder(binaryString).reverse().toString();
+        if (binaryString.equals(reversedString)) {
+            System.out.println(x + " has a binary palindrome representation.");
+        } else {
+            System.out.println(x + " does not have a binary palindrome representation.");
+        }
+    }
+}
+==============================================================
+LEXIcographic
+public class Main
+{
+	public static void main(String[] args) {
+		String s = "malayalam";
+	    int len = s.length();
+	    int max = 26;
+	    int freq[] = new int[max];
+	    for(int i=0;i<len;i++)
+	    freq[s.charAt(i)-'a']++;
+	    if(CanMakePalindrome(freq,max,len) == false)
+	    {
+	    System.out.println("No palindromic string");
+	    System.exit(0);
+	    }
+	    String odd_str="";
+	    for(int i=0;i<max;i++)
+	    {
+	        if(freq[i]%2!=0)
+	        {
+	            freq[i]--;
+	            odd_str =odd_str + (char)(i+'a'); 
+	        }
+	    }
+	    String f="",r="";
+	    for(int i=0;i<max;i++)
+	    {
+	        if(freq[i]!=0)
+	        {
+	        String temp = "";
+	        char ch = (char) (i+'a');
+	        for(int j=1;j<=freq[i]/2;j++)
+	        {
+	            temp = temp + ch;
+	        }
+	        f = f+temp;
+	        r = temp+r;
+	    }
+	    }
+	    System.out.println(f+odd_str+r);
+	    
+	}
+	    public static boolean CanMakePalindrome(int freq[],int max,int len)
+	    {
+	    int odd_cnt=0;
+	    for(int i=0;i<max;i++)
+	    {
+	        if(freq[i]%2!=0)
+	        odd_cnt++;
+	    }
+	    if(len%2 == 0)
+	    {
+	        if(odd_cnt>0)
+	        {
+	            return false;
+	        }
+	        else
+	        {
+	            return true;
+	        }   
+	   }
+	   else
+	   {
+	       if(odd_cnt!=1)
+	       return false;
+	   }
+	    return true;    
+	  }
+}	
+=============================================================
+krathshuba
+import java.util.Scanner;
+class Main {
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter two integers:");
+        int num1 = scan.nextInt();
+        int num2 = scan.nextInt();
+        long product = (long) num1 * num2;
+        System.out.println("Product is " + product);
+        scan.close();
+    }
+}
+==================================================================
+HOURGLASS
+import java.util.Scanner;
+public class Main {
+    public static int findMaxSum(int [][]mat, int R, int C) {
+        int max_sum = 0;
+        int sum;
+        if (R < 3 || C < 3) {
+            System.out.println("Not possible");
+            System.exit(0);
+        }
+        for (int i = 0; i < R - 2; i++) {
+            for (int j = 0; j < C - 2; j++) {
+                sum = (mat[i][j] + mat[i][j + 1] + mat[i][j + 2]) // Top row
+                      + (mat[i + 1][j + 1])                     // Middle element
+                      + (mat[i + 2][j] + mat[i + 2][j + 1] + mat[i + 2][j + 2]); // Bottom row
+                max_sum = Math.max(max_sum, sum);
+            }
+        }
+        return max_sum;
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int R = sc.nextInt();
+        int C = sc.nextInt();
+        int[][] mat = new int[R][C];
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                mat[i][j] = sc.nextInt();
+            }
+        }
+        System.out.println("Maximum hourglass sum: " + findMaxSum(mat, R, C));
+    }
+}
+==================================================================
+RIGHT LEADER
+import java.util.*;
+public class Main {
+    static void Leader(int[] arr, int n){
+        int rmax = arr[arr.length-1];
+        System.out.print(rmax+" ");
+        for(int i=n-2; i>=0; i--){
+            if(arr[i]>rmax){
+                rmax=arr[i];
+                System.out.print(rmax+" ");
+            }
+        }
+    }
+    public static void main(String args[]){
+        Scanner scan = new Scanner(System.in);
+        int n = scan.nextInt();
+        int[] arr = new int[n];
+        for(int i=0; i<n; i++){
+            arr[i] = scan.nextInt();
+        }
+        Leader(arr,n);
+    }
+}
+==================================================================
+MAX SUB ARR
+import java.util.*;
+public class Main {
+    public static void main(String args[]){
+        Scanner scan =  new Scanner(System.in);
+        int n = scan.nextInt();
+        int[] arr = new int[n];
+        for(int  i=0; i<n; i++){
+            arr[i] = scan.nextInt();
+        }
+        int prefix =1;
+        int suffix =1;
+        int ans =1;
+        for(int i=0; i<n; i++){
+            if(prefix==0){
+                prefix =1;
+            }
+            if(suffix==0){
+                suffix=1;
+                }
+            prefix = prefix*arr[i];
+            suffix = suffix*arr[n-i-1];
+            ans = Math.max(ans, Math.max(prefix, suffix));
+        }
+        System.out.println(ans);
+    }
+}
+==================================================================
+NIBBLE SWAP
+import java.util.*;
+public class Main {
+    public static void main(String args[]){
+        Scanner scan = new Scanner(System.in);
+        int n = scan.nextInt();
+        int swapnum = ((n & 0x0F) <<4 | (n & 0xF0)>>4);
+        System.out.println("Number before swap: "+n);
+        System.out.println("Number after swap: "+swapnum);
+    }
+}
+==================================================================
+MAJ ELEM
+import java.util.*;
+public class Main {
+    public static int Major(int[] arr){
+        int m=-1;
+        int i=0;
+        for(int j=0; j<arr.length; j++){
+            if(i==0){
+                m = arr[j];
+                System.out.println("m "+m);
+                i=1;
+                System.out.println("i "+i);
+            }
+            else if(m==arr[j]){
+                System.out.println("m "+m);
+                System.out.println("arr[j] "+arr[j]);
+                System.out.println("i "+i);
+                i++;
+                System.out.println("i "+i);
+            }
+            else{
+                i--;
+                System.out.println("i "+i);
+            }
+        }
+        return m;
+    }
+    public static void main(String args[]){
+        Scanner scan = new Scanner(System.in);
+        int n = scan.nextInt();
+        int[] arr = new int[n];
+        for(int i=0; i<n; i++){
+            arr[i] = scan.nextInt();
+        }
+        System.out.println("MAJOR ELEMENT"+Major(arr));
+    }
+}
+==================================================================
+Simple Seive
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter a number:");
+        int num = sc.nextInt();
+        boolean[] bool = new boolean[num + 1]; // Include num in the range
+        for(int i=0;i<=num;i++){
+            bool[i]=true;
+        bool[0] = bool[1] = false; // 0 and 1 are not primes
+
+        for (int i = 2; i <= Math.sqrt(num); i++) {
+            if (bool[i]) { // If i is still marked as prime
+                for (int j = i * i; j <= num; j += i) {
+                    bool[j] = false; // Mark multiples of i as non-prime
+                }
+            }
+        }
+        System.out.println("List of prime numbers up to the given number are:");
+        for (int i = 2; i <= num; i++) {
+            if (bool[i]) {
+                System.out.println(i);
+            }
+        }
+        sc.close(); // Close the scanner to prevent resource leaks
+    }
+}
+==================================================================
+Euclids
+import java.util.Scanner;
+class Main {
+    // Method to calculate GCD using recursion
+    public static int gcd(int a, int b) {
+        if (a == 0) {
+            return b;
+        }
+        return gcd(b % a, a);
+    }
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+
+        // Input two integers
+        System.out.println("Enter two integers:");
+        int n1 = scan.nextInt();
+        int n2 = scan.nextInt();
+
+        // Compute GCD
+        int g = gcd(n1, n2);
+        System.out.println("GCD is " + g);
+
+        // Close the scanner
+        scan.close();
+    }
+}
+============================================================================
+Warnsdorff’s algorithm 
+public class Main {
+    static int N = 8;
+    static int[] dx = {2, 1, -1, -2, -2, -1, 1, 2};
+    static int[] dy = {1, 2, 2, 1, -1, -2, -2, -1};
+
+    public static void main(String[] args) {
+        int[][] board = new int[N][N];
+        for (int[] row : board) java.util.Arrays.fill(row, -1);
+        board[0][0] = 0;
+
+        if (solveKT(0, 0, 1, board))
+            printBoard(board);
+        else
+            System.out.println("No solution");
+    }
+
+    static boolean solveKT(int x, int y, int move, int[][] board) {
+        if (move == N * N) return true;
+
+        int[] nextMove = nextBestMove(x, y, board);
+        if (nextMove == null) return false;
+
+        int newX = nextMove[0], newY = nextMove[1];
+        board[newX][newY] = move;
+
+        if (solveKT(newX, newY, move + 1, board)) return true;
+
+        board[newX][newY] = -1;
+        return false;
+    }
+
+    static int[] nextBestMove(int x, int y, int[][] board) {
+        int minDeg = N + 1, nextX = -1, nextY = -1;
+        for (int i = 0; i < 8; i++) {
+            int newX = x + dx[i], newY = y + dy[i];
+            if (isSafe(newX, newY, board)) {
+                int deg = countSafeMoves(newX, newY, board);
+                if (deg < minDeg) {
+                    minDeg = deg;
+                    nextX = newX;
+                    nextY = newY;
+                }
+            }
+        }
+        return (nextX == -1) ? null : new int[]{nextX, nextY};
+    }
+
+    static boolean isSafe(int x, int y, int[][] board) {
+        return x >= 0 && y >= 0 && x < N && y < N && board[x][y] == -1;
+    }
+
+    static int countSafeMoves(int x, int y, int[][] board) {
+        int count = 0;
+        for (int i = 0; i < 8; i++) {
+            if (isSafe(x + dx[i], y + dy[i], board)) count++;
+        }
+        return count;
+    }
+
+    static void printBoard(int[][] board) {
+        for (int[] row : board) {
+            for (int cell : row) System.out.print(cell + " ");
+            System.out.println();
+        }
+    }
+}
+=======================================================================
+n QUEENS
+public class Main {
+    static int N = 4; // Change this to any value for N-Queens
+    static int[][] board = new int[N][N];
+    public static void main(String[] args) {
+        if (solveNQueens(0)) {
+            printBoard();
+        } else {
+            System.out.println("Solution does not exist");
+        }
+    }
+    static boolean solveNQueens(int row) {
+        if (row == N) return true;
+
+        for (int col = 0; col < N; col++) {
+            if (isSafe(row, col)) {
+                board[row][col] = 1;
+
+                if (solveNQueens(row + 1)) return true;
+
+                board[row][col] = 0; // Backtrack
+            }
+        }
+        return false;
+    }
+    static boolean isSafe(int row, int col) {
+        for (int i = 0; i < row; i++) {
+            if (board[i][col] == 1) return false;
+        }
+        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 1) return false;
+        }
+        for (int i = row - 1, j = col + 1; i >= 0 && j < N; i--, j++) {
+            if (board[i][j] == 1) return false;
+        }
+        return true;
+    }
+    static void printBoard() {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                System.out.print(board[i][j] == 1 ? "Q " : ". ");
+            }
+            System.out.println();
+        }
+    }
+}
+================================================================================
+Remainder Theorem
+import java.util.Scanner;
+class Main {
+    static int findMinX(int num[], int rem[], int k) {
+        int x = 1; // Start from 1
+        while (true) {
+            int j;
+            for (j = 0; j < k; j++) {
+                // Check if x satisfies all congruence equations
+                if (x % num[j] != rem[j]) {
+                    break;
+                }
+            }
+            // If all equations are satisfied, return x
+            if (j == k) {
+                return x;
+            }
+            x++;
+        }
+    }
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the number of congruence relations:");
+        int size = sc.nextInt();
+        int a[] = new int[size];
+        int m[] = new int[size];
+        System.out.println("Enter the values of remainders (a):");
+        for (int i = 0; i < size; i++) {
+            a[i] = sc.nextInt();
+        }
+        System.out.println("Enter the values of divisors (m):");
+        for (int i = 0; i < size; i++) {
+            m[i] = sc.nextInt();
+        }
+        System.out.println("x is " + findMinX(m, a, size));
+        sc.close(); // Close the scanner
+    }
+}
+=====================================================================================
+
+
+import java.util.Scanner;
+Public class Main {
+    public static boolean isPalindrome(int N) {
+        String s = Integer.toBinaryString(N); // Convert number to binary string
+        int i = 0, j = s.length() - 1;
+        while (i < j) {
+            if (s.charAt(i) != s.charAt(j)) { // Check if characters are unequal
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+    public static void main(String[] args) {
+        Scanner sl = new Scanner(System.in);
+        System.out.println("Enter the number:");
+        int x = sl.nextInt();
+        System.out.println("Is the binary representation a palindrome? " + isPalindrome(x));
+        sl.close(); // Close the scanner
+    }
+}
+==============================================================================
+max product subarray
+import java.util.Scanner;
+class Main {
+    public static int maxProduct(int[] nums) {
+        int maxProduct = nums[0];
+        int currentMax = nums[0];
+        int currentMin = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] < 0) {
+                int temp = currentMax;
+                currentMax = currentMin;
+                currentMin = temp;
+            }
+            currentMax = Math.max(nums[i], currentMax * nums[i]);
+            currentMin = Math.min(nums[i], currentMin * nums[i]);
+            maxProduct = Math.max(maxProduct, currentMax);
+        }
+        return maxProduct;
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the size of the array:");
+        int n = sc.nextInt();
+        int[] nums = new int[n];
+        System.out.println("Enter the array elements:");
+        for (int i = 0; i < n; i++) {
+            nums[i] = sc.nextInt();
+        }
+        System.out.println("Maximum Product Subarray is: " + maxProduct(nums));
+        sc.close();
+    }
+}
+===============================================================================
+Eulers Phi
+
+class Main {
+    static int gcd(int a, int b) {
+        if (a == 0) {
+            return b;
+        }
+        return gcd(b % a, a);
+    }
+    static int phi(int n) {
+        int result = 1;
+        for (int i = 2; i < n; i++) {
+            if (gcd(i, n) == 1) {
+                result++;
+            }
+        }
+        return result;
+    }
+    public static void main(String[] args) {
+        int n = 5;
+        // Finding Phi for input n
+        System.out.println("Phi(" + n + ") = " + phi(n));
+    }
+}
